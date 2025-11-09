@@ -25,7 +25,7 @@
     /*========= RIGHT – 10% – VERTICAL – TEXT BUTTONS – GOLDEN TIPS =========*/
     .top-right-btns{
       position:fixed;
-      top:calc(12px + 50px + 5vh); /* ← 5% من ارتفاع الشاشة */
+      top:calc(12px + 50px); /* موقع زر Mystery Box */
       right:10%;
       display:flex;
       flex-direction:column;
@@ -70,6 +70,8 @@
       transition:opacity .2s
     }
     .top-text-btn:hover::after{opacity:1}
+    /* فاصل 10% بين الزرين */
+    #quickBonus{ margin-top:10vh; }
 
     /*========= CENTER RIPPLE CIRCLE =========*/
     #centerCircle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;
