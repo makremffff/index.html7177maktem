@@ -3,71 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <title>Ad Clicks – Full Features</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    /* ====== General Settings ====== */
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{margin:0;padding:0;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#111;color:#fff}
-    #main{position:fixed;inset:0;background:url("img5.png") center/cover no-repeat;opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 8px 12px}
-    
-    /* ====== Top Left ====== */
+    /*========= CORE RESET =========*/
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#111;color:#fff}
+
+    /*========= MAIN CANVAS =========*/
+    #main{position:fixed;inset:0;background:url("img5.png") center/cover no-repeat;opacity:0;transition:opacity .6s ease;
+          display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 8px 12px}
+
+    /*========= TOP-LEFT BARS =========*/
     #balanceBoxes{position:fixed;top:12px;left:12px;display:flex;gap:8px;z-index:5}
-    .balanceBox{background:rgba(0,0,0,.55);backdrop-filter:blur(4px);border:1.5px solid rgba(255,215,0,.5);border-radius:10px;padding:10px 14px;color:#fff;font-size:16px;font-weight:bold}
-    #countdownBox{position:fixed;top:60px;left:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);border:1.5px solid rgba(255,215,0,.5);border-radius:10px;padding:12px 16px;color:#ffd700;font-size:18px;font-weight:bold;z-index:5}
-    #autoIndicator{position:fixed;top:108px;left:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);border:1.5px solid rgba(255,215,0,.5);border-radius:10px;padding:10px 14px;color:#ffd700;font-size:16px;font-weight:bold;z-index:5}
-    
-    /* ====== Top Right – 2cm down – Small Size ====== */
-    .side-btn{position:fixed;right:12px;width:70px;height:70px;border:none;background:transparent;cursor:pointer;transition:transform .2s ease}
-    .side-btn:hover{transform:scale(1.1)}
-    #mysteryBox{top:calc(156px + 20px)}   /* 2cm down from auto-indicator */
-    #quickBonus{top:calc(194px + 20px)}  /* 2cm down from previous box */
-    
-    /* ====== Center Screen ====== */
-    #centerCircle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;border-radius:50%;overflow:visible;background:#666;box-shadow:0 0 8px rgba(0,0,0,.55)}
+    .balanceBox{background:rgba(0,0,0,.55);backdrop-filter:blur(4px);border:1.5px solid rgba(255,215,0,.5);
+               border-radius:10px;padding:10px 14px;color:#fff;font-size:16px;font-weight:bold}
+    #countdownBox{position:fixed;top:60px;left:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+                  border:1.5px solid rgba(255,215,0,.5);border-radius:10px;padding:12px 16px;color:#ffd700;font-size:18px;font-weight:bold;z-index:5}
+    #autoIndicator{position:fixed;top:108px;left:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+                   border:1.5px solid rgba(255,215,0,.5);border-radius:10px;padding:10px 14px;color:#ffd700;font-size:16px;font-weight:bold;z-index:5}
+
+    /*========= TOP-RIGHT – VERTICAL – 5 cm DOWN – HALF SIZE – GOLDEN TIPS =========*/
+    .top-right-btns{position:fixed;top:calc(12px + 50px);right:12px;display:flex;flex-direction:column;gap:8px;z-index:5} /* 50px = 5 cm */
+    .top-btn{width:35px;height:35px;border:2px solid rgba(255,215,0,.8);border-radius:8px;
+             background:rgba(0,0,0,.45);backdrop-filter:blur(4px);cursor:pointer;transition:transform .2s ease;
+             box-shadow:0 0 6px rgba(255,215,0,.4);position:relative}
+    .top-btn:hover{transform:scale(1.1)}
+    .top-btn img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+    /* تعليمات زهية تظهر أسفل كل زر عند الهوفر */
+    .top-btn::after{content:attr(title);position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);
+                    background: rgba(255,215,0,.9); color:#000; font-size:10px; font-weight:bold;
+                    padding:2px 6px; border-radius:4px; white-space:nowrap; opacity:0; transition:opacity .2s}
+    .top-btn:hover::after{opacity:1}
+
+    /*========= CENTER RIPPLE CIRCLE =========*/
+    #centerCircle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;
+                  border-radius:50%;overflow:visible;background:#666;box-shadow:0 0 8px rgba(0,0,0,.55)}
     #centerCircle img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-    #centerCircle.ripple::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:radial-gradient(circle, rgba(255,0,0,.9) 0%, rgba(180,0,0,.85) 22%, rgba(0,0,0,.8) 44%, rgba(255,0,0,.7) 66%, rgba(0,0,0,.6) 88%, transparent 100%);border-radius:50%;transform:translate(-50%,-50%);animation:denseRipple 1.3s ease-out infinite}
+    #centerCircle.ripple::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;
+                                background:radial-gradient(circle, rgba(255,0,0,.9) 0%, rgba(180,0,0,.85) 22%, rgba(0,0,0,.8) 44%, rgba(255,0,0,.7) 66%, rgba(0,0,0,.6) 88%, transparent 100%);
+                                border-radius:50%;transform:translate(-50%,-50%);animation:denseRipple 1.3s ease-out infinite}
     @keyframes denseRipple{0%{width:0;height:0;opacity:1}100%{width:260px;height:260px;opacity:0}}
-    
-    /* ====== Bottom Screen ====== */
+
+    /*========= BOTTOM BUTTONS ROW =========*/
     #buttonsRow{display:flex;gap:12px;margin-bottom:12px;justify-content:center}
     .img-btn{width:70px;height:70px;border:none;background:transparent;cursor:pointer;transition:transform .2s ease}
     .img-btn:hover{transform:scale(1.1)}
-    #adBadge{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#ff0033;color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;line-height:1;box-shadow:0 0 4px rgba(0,0,0,.4);z-index:6}
-    
-    /* ====== Other Styles ====== */
+    #adBadge{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#ff0033;color:#fff;
+              font-size:10px;font-weight:bold;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;line-height:1;box-shadow:0 0 4px rgba(0,0,0,.4);z-index:6}
+
+    /*========= SPLASH =========*/
     #splash{position:fixed;inset:0;background:url("img4.png") center/cover no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;transition:opacity .6s ease}
     #splash .circle{width:90px;height:90px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 3px #FFD700}
     #splash .circle img{width:100%;height:100%;object-fit:cover;display:block}
     #splash .progress-wrapper{width:90px;height:5px;background:#222;border-radius:3px;overflow:hidden;margin-top:10px}
     #splash .progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#ff8c00,#ffd700,#ff8c00);border-radius:3px;animation:loading 3s linear forwards}
     @keyframes loading{0%{width:0%}100%{width:100%}}
-    
+
+    /*========= TUTORIAL =========*/
     #tutorial{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:20}
     .tutorialBox{background:#111;border:2px solid #FFD700;border-radius:14px;padding:18px 22px;max-width:280px;text-align:center;color:#fff;font-size:12px;line-height:1.5}
     .tutorialBox h3{margin:0 0 10px;color:#FFD700}
     .tutorialBox button{margin-top:10px;padding:8px 18px;font-size:12px;font-weight:bold;border:none;border-radius:10px;background:#FFD700;color:#000;cursor:pointer}
-    
+
+    /*========= MODALS =========*/
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:30}
     .modal-content{background:#1a1a1a;border:1.5px solid rgba(255,215,0,.5);border-radius:12px;padding:14px;width:90%;max-width:300px;color:#fff;font-size:11px;display:flex;flex-direction:column;gap:8px}
     .modal-content input{padding:7px;font-size:11px;border-radius:6px;border:none;text-align:center}
     .modal-content button{padding:8px;font-size:11px;border-radius:6px;border:none;background:#FFD700;color:#000;font-weight:bold;cursor:pointer}
     .close-btn{align-self:flex-end;font-size:14px;cursor:pointer;color:#FFD700}
-    
-    @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
-    .pop{animation:pop .4s ease}
+
+    /*========= POP EFFECT =========*/
+    @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+    .pop{animation:pop .3s ease}
   </style>
 <base target="_blank">
 </head>
 <body>
 
-  <!-- ====== Splash ====== -->
+  <!--========= SPLASH/LOADING =========-->
   <div id="splash">
     <div class="circle"><img src="img2.png" alt="Circle"></div>
     <div class="progress-wrapper"><div class="progress-bar"></div></div>
   </div>
 
-  <!-- ====== Main Screen ====== -->
+  <!--========= MAIN GAME BOARD =========-->
   <div id="main">
-    <!-- Top Left -->
+    <!-- Top-left Info Bars -->
     <div id="balanceBoxes">
       <div class="balanceBox">💰 Points: <span id="clicks">0</span></div>
       <div class="balanceBox">💵 USDT: <span id="usdt">0</span></div>
@@ -75,18 +96,16 @@
     <div id="countdownBox">⏳ <span id="timer">03:00:00</span></div>
     <div id="autoIndicator">⚡ Auto-Click OFF</div>
 
-    <!-- Top Right – 2cm down -->
-    <button class="side-btn" id="mysteryBox" title="Mystery Box every 5 min">
-      <img src="bt5.png" width="70" height="70" alt="Mystery">
-    </button>
-    <button class="side-btn" id="quickBonus" title="Quick Bonus every 24 h">
-      <img src="bt6.png" width="70" height="70" alt="Quick">
-    </button>
+    <!-- Top-right VERTICAL 35×35 buttons (5 cm down) with golden tips -->
+    <div class="top-right-btns">
+      <button class="top-btn" id="mysteryBox" title="Mystery Box (5 min)"><img src="bt5.png" width="35" height="35" alt="Mystery"></button>
+      <button class="top-btn" id="quickBonus" title="Quick Bonus (24 h)"><img src="bt6.png" width="35" height="35" alt="Quick"></button>
+    </div>
 
-    <!-- Center -->
+    <!-- Center Ripple Circle -->
     <div id="centerCircle"><img src="img3.png" alt="Center"></div>
 
-    <!-- Bottom -->
+    <!-- Bottom Main Buttons -->
     <div id="buttonsRow">
       <div style="position:relative;">
         <div id="adBadge">30</div>
@@ -98,7 +117,7 @@
     </div>
   </div>
 
-  <!-- ====== Tutorial ====== -->
+  <!--========= TUTORIAL (FIRST VISIT) =========-->
   <div id="tutorial" style="display:none">
     <div class="tutorialBox">
       <h3>How to play?</h3>
@@ -109,19 +128,17 @@
     </div>
   </div>
 
-  <!-- ====== Modals ====== -->
+  <!--========= TASKS MODAL =========-->
   <div class="modal" id="taskModal">
     <div class="modal-content">
       <span class="close-btn" id="closeTask">&times;</span>
       <div><strong>Daily Tasks</strong></div>
-      <label id="joinChannelLbl">
-        <input type="checkbox" id="joinChannelCheck" data-pts="10000">
-        Join Channel (+10,000)
-      </label>
+      <label><input type="checkbox" id="joinChannelCheck" data-pts="10000"> Join Channel (+10,000)</label>
       <button id="claimTasks">Claim Rewards</button>
     </div>
   </div>
 
+  <!--========= SWAP MODAL =========-->
   <div class="modal" id="swapModal">
     <div class="modal-content">
       <span class="close-btn" id="closeSwap">&times;</span>
@@ -132,6 +149,7 @@
     </div>
   </div>
 
+  <!--========= WITHDRAW MODAL =========-->
   <div class="modal" id="withdrawModal">
     <div class="modal-content">
       <span class="close-btn" id="closeWithdraw">&times;</span>
@@ -143,11 +161,11 @@
     </div>
   </div>
 
-  <!-- ====== GigaPub Ads ====== -->
+  <!--========= GIGAPUB ADS =========-->
   <script src="https://ad.gigapub.tech/script?id=3459"></script>
 
   <script>
-    /* ====== LocalStorage Keys ====== */
+    /*========= LOCALSTORAGE KEYS =========*/
     const LS = {
       clicks: 'adclicks_clicks',
       usdt: 'adclicks_usdt',
@@ -160,14 +178,14 @@
       quickLastClaim: 'quickLastClaim'
     };
 
-    /* ====== Restore or Init ====== */
+    /*========= RESTORE / INIT =========*/
     let clicks   = parseInt(localStorage.getItem(LS.clicks))   || 0;
     let usdt     = parseFloat(localStorage.getItem(LS.usdt)) || 0;
     let counter  = parseInt(localStorage.getItem(LS.counter)) || 30;
     let autoClickEnabled = localStorage.getItem(LS.auto) === 'true';
     let timeLeft = parseInt(localStorage.getItem(LS.countdown)) || (3 * 3600);
 
-    /* ====== DOM ====== */
+    /*========= DOM SHORTCUTS =========*/
     const splash = document.getElementById('splash');
     const main = document.getElementById('main');
     const tutorial = document.getElementById('tutorial');
@@ -185,7 +203,7 @@
     const mysteryBox = document.getElementById('mysteryBox');
     const quickBonus = document.getElementById('quickBonus');
 
-    /* ====== Utility: Save ====== */
+    /*========= UTILITIES =========*/
     function saveAll() {
       localStorage.setItem(LS.clicks, clicks);
       localStorage.setItem(LS.usdt, usdt);
@@ -193,8 +211,6 @@
       localStorage.setItem(LS.auto, autoClickEnabled);
       localStorage.setItem(LS.countdown, timeLeft);
     }
-
-    /* ====== UI Update ====== */
     function updateUI() {
       clicksSpan.textContent = clicks;
       usdtSpan.textContent = usdt.toFixed(3);
@@ -206,34 +222,26 @@
     }
     updateUI();
 
-    /* ====== Splash -> Main ====== */
+    /*========= SPLASH -> MAIN =========*/
     splash.querySelector('.progress-bar').addEventListener('animationend', () => {
       splash.style.opacity = 0;
-      setTimeout(() => {
-        splash.style.display = 'none';
-        main.style.opacity = 1;
-        if (!sessionStorage.getItem(LS.tutorial)) tutorial.style.display = 'flex';
-      }, 600);
+      setTimeout(() => { splash.style.display = 'none'; main.style.opacity = 1; }, 600);
+      if (!sessionStorage.getItem(LS.tutorial)) tutorial.style.display = 'flex';
     });
-    gotItBtn.addEventListener('click', () => {
-      tutorial.style.display = 'none';
-      sessionStorage.setItem(LS.tutorial, 'true');
-    });
+    gotItBtn.addEventListener('click', () => { tutorial.style.display = 'none'; sessionStorage.setItem(LS.tutorial, 'true'); });
 
-    /* ====== Ads Button ====== */
+    /*========= ADS BUTTON (30x) =========*/
     adBtn.addEventListener('click', () => {
       if (counter <= 0) return;
       window.showGiga()
         .then(() => {
           counter--;
           saveAll();
-          adBadge.textContent = counter;
-          if (counter === 0) adBadge.style.display = 'none';
+          updateUI();
           if (counter === 0 && !autoClickEnabled) {
             autoClickEnabled = true;
             saveAll();
-            autoIndicator.textContent = '⚡ Auto-Click ON';
-            centerCircle.classList.add('ripple');
+            updateUI();
             startAutoClick();
             startCountdown();
             alert("✅ All ads watched! Auto-Click activated for 3 hours.");
@@ -242,43 +250,51 @@
         .catch(() => alert("Ad skipped or failed. No reward."));
     });
 
-    /* ====== Mystery Box (every 5 min – max 200 coins) ====== */
-    function canClaimMystery(){
-      const last = parseInt(localStorage.getItem(LS.mysteryLastClaim))||0;
-      return (Date.now() - last) >= 5*60*1000;
+    /*========= CENTER MANUAL CLICK =========*/
+    centerCircle.addEventListener('click', () => {
+      if (!autoClickEnabled) return;
+      clicks++;
+      clicksSpan.textContent = clicks;
+      saveAll();
+    });
+
+    /*========= MYSTERY BOX (5 min – max 200) =========*/
+    function canClaimMystery() {
+      const last = parseInt(localStorage.getItem(LS.mysteryLastClaim)) || 0;
+      return (Date.now() - last) >= 5 * 60 * 1000;
     }
-    function updateMysteryVisual(){
+    function updateMysteryVisual() {
       mysteryBox.style.border = canClaimMystery() ? '2px solid lime' : '1.5px solid rgba(255,215,0,.5)';
     }
     updateMysteryVisual();
     mysteryBox.addEventListener('click', () => {
-      if(!canClaimMystery()) return alert('🎁 Come back after 5 minutes');
+      if (!canClaimMystery()) return alert('🎁 Come back after 5 minutes');
       window.showGiga()
         .then(() => {
-          const reward = Math.floor(Math.random()*(200-10+1))+10; // 10-200 max
+          const reward = Math.floor(Math.random() * (200 - 10 + 1)) + 10; // 10-200 max
           clicks += reward;
           clicksSpan.textContent = clicks;
           localStorage.setItem(LS.mysteryLastClaim, Date.now());
           saveAll();
           updateMysteryVisual();
           mysteryBox.classList.add('pop');
-          setTimeout(()=>mysteryBox.classList.remove('pop'),400);
+          setTimeout(() => mysteryBox.classList.remove('pop'), 300);
           alert(`🎁 Congrats! You got ${reward} points`);
         })
         .catch(() => alert("Ad skipped or failed. No reward."));
     });
 
-    /* ====== Quick Bonus (every 24 h) ====== */
-    function canClaimQuick(){
-      const last = parseInt(localStorage.getItem(LS.quickLastClaim))||0;
-      return (Date.now() - last) >= 24*60*60*1000;
+    /*========= QUICK BONUS (24 h) =========*/
+    function canClaimQuick() {
+      const last = parseInt(localStorage.getItem(LS.quickLastClaim)) || 0;
+      return (Date.now() - last) >= 24 * 60 * 60 * 1000;
     }
-    function updateQuickVisual(){
+    function updateQuickVisual() {
       quickBonus.style.border = canClaimQuick() ? '2px solid lime' : '1.5px solid rgba(255,215,0,.5)';
     }
     updateQuickVisual();
     quickBonus.addEventListener('click', () => {
-      if(!canClaimQuick()) return alert('⚡ Come back after 24 hours');
+      if (!canClaimQuick()) return alert('⚡ Come back after 24 hours');
       window.showGiga()
         .then(() => {
           const reward = 500;
@@ -288,25 +304,22 @@
           saveAll();
           updateQuickVisual();
           quickBonus.classList.add('pop');
-          setTimeout(()=>quickBonus.classList.remove('pop'),400);
+          setTimeout(() => quickBonus.classList.remove('pop'), 300);
           alert(`⚡ Quick bonus! +${reward} points`);
         })
         .catch(() => alert("Ad skipped or failed. No reward."));
     });
 
-    /* ====== Tasks ====== */
-    taskBtn.addEventListener('click', () => { document.getElementById('taskModal').style.display = 'flex'; });
-    document.getElementById('closeTask').onclick = () => { document.getElementById('taskModal').style.display = 'none'; };
-    document.getElementById('joinChannelCheck').onchange = e => {
-      if (e.target.checked) window.open('https://t.me/+FlfyjU68Txg2NjE8', '_blank');
-    };
+    /*========= TASKS =========*/
+    taskBtn.addEventListener('click', () => document.getElementById('taskModal').style.display = 'flex');
+    document.getElementById('closeTask').onclick = () => document.getElementById('taskModal').style.display = 'none';
+    document.getElementById('joinChannelCheck').onchange = e => { if (e.target.checked) window.open('https://t.me/+FlfyjU68Txg2NjE8', '_blank'); };
     document.getElementById('claimTasks').onclick = () => {
       const ch = document.getElementById('joinChannelCheck');
       if (!ch.checked) return alert('Please complete the task first');
       if (localStorage.getItem(LS.joined)) return alert('You have already claimed the join bonus');
       clicks += 10000;
-      saveAll();
-      clicksSpan.textContent = clicks;
+      saveAll(); updateUI();
       localStorage.setItem(LS.joined, 'true');
       ch.disabled = true;
       document.getElementById('joinChannelLbl').style.textDecoration = 'line-through';
@@ -314,9 +327,9 @@
       document.getElementById('taskModal').style.display = 'none';
     };
 
-    /* ====== Swap ====== */
-    swapBtn.addEventListener('click', () => { document.getElementById('swapModal').style.display = 'flex'; });
-    document.getElementById('closeSwap').onclick = () => { document.getElementById('swapModal').style.display = 'none'; };
+    /*========= SWAP =========*/
+    swapBtn.addEventListener('click', () => document.getElementById('swapModal').style.display = 'flex');
+    document.getElementById('closeSwap').onclick = () => document.getElementById('swapModal').style.display = 'none';
     const swapInput = document.getElementById('swapInput');
     const usdtPreview = document.getElementById('usdtPreview');
     swapInput.addEventListener('input', () => {
@@ -329,15 +342,14 @@
       if (pts > clicks) return alert("Insufficient balance");
       const reward = (pts / 10000) * 0.005;
       clicks -= pts; usdt += reward;
-      saveAll();
-      clicksSpan.textContent = clicks; usdtSpan.textContent = usdt.toFixed(3);
+      saveAll(); updateUI();
       document.getElementById('swapModal').style.display = 'none';
       alert(`Converted! You received ${reward.toFixed(3)} USDT`);
     };
 
-    /* ====== Withdraw ====== */
-    withdrawBtn.addEventListener('click', () => { document.getElementById('withdrawModal').style.display = 'flex'; });
-    document.getElementById('closeWithdraw').onclick = () => { document.getElementById('withdrawModal').style.display = 'none'; };
+    /*========= WITHDRAW =========*/
+    withdrawBtn.addEventListener('click', () => document.getElementById('withdrawModal').style.display = 'flex');
+    document.getElementById('closeWithdraw').onclick = () => document.getElementById('withdrawModal').style.display = 'none';
     document.getElementById('confirmWithdraw').onclick = () => {
       const addr = document.getElementById('withdrawAddress').value.trim();
       const amt = parseFloat(document.getElementById('withdrawAmount').value);
@@ -354,27 +366,19 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chat_id: chatID, text: msg, parse_mode: "HTML" })
       })
-      .then(r => r.json())
-      .then(d => {
-        if (d.ok) {
-          usdt -= amt; usdtSpan.textContent = usdt.toFixed(3);
-          saveAll();
-          document.getElementById('withdrawModal').style.display = 'none';
-          alert("Withdrawal request sent to admin!");
-        } else alert("Failed to send notification.");
-      })
-      .catch(() => alert("Network error."));
+        .then(r => r.json())
+        .then(d => {
+          if (d.ok) {
+            usdt -= amt; usdtSpan.textContent = usdt.toFixed(3);
+            saveAll(); updateUI();
+            document.getElementById('withdrawModal').style.display = 'none';
+            alert("Withdrawal request sent to admin!");
+          } else alert("Failed to send notification.");
+        })
+        .catch(() => alert("Network error."));
     };
 
-    /* ====== Center manual click ====== */
-    centerCircle.addEventListener('click', () => {
-      if (!autoClickEnabled) return;
-      clicks++;
-      clicksSpan.textContent = clicks;
-      saveAll();
-    });
-
-    /* ====== Auto-click & 3-hour countdown ====== */
+    /*========= AUTO-CLICK & 3-HOUR COUNTDOWN =========*/
     let autoClickInterval = null;
     let countdownInterval = null;
 
@@ -389,10 +393,7 @@
       countdownInterval = setInterval(() => {
         if (timeLeft <= 0) {
           clearInterval(countdownInterval); clearInterval(autoClickInterval);
-          autoClickEnabled = false;
-          autoIndicator.textContent = '⚡ Auto-Click OFF';
-          centerCircle.classList.remove('ripple');
-          saveAll();
+          autoClickEnabled = false; saveAll(); updateUI();
           const telegramToken = "8222744961:AAE90Eehr8PqldV6oKxIS9Yo9hw69Zi83Us";
           const chatID = "8447940021";
           const msg = `⏰ Auto-Click finished!\n👤 User: @${window.telegramUsername||"Not Provided"}\n💰 Your current points: ${clicks}`;
@@ -412,15 +413,10 @@
       }, 1000);
     }
 
-    /* ====== Resume if auto was ON ====== */
+    /*========= RESUME IF AUTO WAS ON =========*/
     if (autoClickEnabled) {
-      if (timeLeft > 0) {
-        startAutoClick();
-        startCountdown();
-      } else {
-        autoClickEnabled = false;
-        saveAll();
-      }
+      if (timeLeft > 0) { startAutoClick(); startCountdown(); }
+      else { autoClickEnabled = false; saveAll(); updateUI(); }
     }
   </script>
 </body>
