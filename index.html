@@ -22,14 +22,13 @@
     #autoIndicator{position:fixed;top:108px;left:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
                    border:1.5px solid rgba(255,215,0,.5);border-radius:10px;padding:10px 14px;color:#ffd700;font-size:16px;font-weight:bold;z-index:5}
 
-    /*========= TOP-RIGHT – VERTICAL – 5 cm DOWN – HALF SIZE – GOLDEN TIPS =========*/
-    .top-right-btns{position:fixed;top:calc(12px + 50px);right:12px;display:flex;flex-direction:column;gap:8px;z-index:5} /* 50px = 5 cm */
-    .top-btn{width:35px;height:35px;border:2px solid rgba(255,215,0,.8);border-radius:8px;
+    /*========= RIGHT – 10% – VERTICAL – DOUBLE SIZE – GOLDEN TIPS =========*/
+    .top-right-btns{position:fixed;top:calc(12px + 50px);right:10%;display:flex;flex-direction:column;gap:8px;z-index:5}
+    .top-btn{width:70px;height:70px;border:2px solid rgba(255,215,0,.8);border-radius:8px;
              background:rgba(0,0,0,.45);backdrop-filter:blur(4px);cursor:pointer;transition:transform .2s ease;
              box-shadow:0 0 6px rgba(255,215,0,.4);position:relative}
     .top-btn:hover{transform:scale(1.1)}
     .top-btn img{width:100%;height:100%;object-fit:cover;border-radius:6px}
-    /* تعليمات زهية تظهر أسفل كل زر عند الهوفر */
     .top-btn::after{content:attr(title);position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);
                     background: rgba(255,215,0,.9); color:#000; font-size:10px; font-weight:bold;
                     padding:2px 6px; border-radius:4px; white-space:nowrap; opacity:0; transition:opacity .2s}
@@ -96,10 +95,10 @@
     <div id="countdownBox">⏳ <span id="timer">03:00:00</span></div>
     <div id="autoIndicator">⚡ Auto-Click OFF</div>
 
-    <!-- Top-right VERTICAL 35×35 buttons (5 cm down) with golden tips -->
+    <!-- RIGHT – 10% – VERTICAL – 70×70 buttons with golden tips -->
     <div class="top-right-btns">
-      <button class="top-btn" id="mysteryBox" title="Mystery Box (5 min)"><img src="bt5.png" width="35" height="35" alt="Mystery"></button>
-      <button class="top-btn" id="quickBonus" title="Quick Bonus (24 h)"><img src="bt6.png" width="35" height="35" alt="Quick"></button>
+      <button class="top-btn" id="mysteryBox" title="Mystery Box (5 min)"><img src="bt5.png" width="70" height="70" alt="Mystery"></button>
+      <button class="top-btn" id="quickBonus" title="Quick Bonus (24 h)"><img src="bt6.png" width="70" height="70" alt="Quick"></button>
     </div>
 
     <!-- Center Ripple Circle -->
