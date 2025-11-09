@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لعبة الإحالات</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #points {
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 لعبة الإحالات</h1>
+  <div id="message"></div>
+  <button onclick="shareReferral()">شارك رابطك واكسب نقاط!</button>
+  <div id="points">جاري تحميل النقاط...</div>
+
+  <script>
+    const supabaseUrl = 'https://fxhctxmcrbfcbmuxugih.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4aGN0eG1jcmJmY2JtdXh1Z2loIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2ODI2NTQsImV4cCI6MjA3ODI1ODY1NH0.RuHOmehKZXzhxFa5pvlMXffh7J9kcZg0aTtnfQn-QLY'; // ← ضع الـ anon key هنا
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    function getTelegramUser() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        return window.Telegram.WebApp.initDataUnsafe?.user;
+      }
+      return null;
+    }
+
+    function getReferrerId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('start');
+    }
+
+    async function saveUser(user, referrerId) {
+      const { error } = await supabase
+        .from('users')
+        .upsert({
+          id: user.id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          username: user.username,
+          is_premium: user.is_premium || false,
+          language_code: user.language_code,
+          points: 0,
+        }, { onConflict: 'id' });
+
+      if (error) {
+        console.error('Error saving user:', error);
+        return;
+      }
+
+      if (referrerId && referrerId !== user.id.toString()) {
+        await supabase.from('referrals').insert({
+          referrer_id: parseInt(referrerId),
+          referred_id: user.id,
+        });
+
+        await supabase.rpc('increment_points', { user_id: parseInt(referrerId), points: 10 });
+        await supabase.rpc('increment_points', { user_id: user.id, points: 5 });
+      }
+    }
+
+    async function loadPoints() {
+      const user = getTelegramUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('points')
+        .eq('id', user.id)
+        .single();
+
+      if (data) {
+        document.getElementById('points').innerText = `نقاطك الحالية: ${data.points} 🎉`;
+      } else {
+        document.getElementById('points').innerText = 'لم يتم العثور على نقاطك.';
+      }
+    }
+
+    function shareReferral() {
+      const user = getTelegramUser();
+      if (!user) return alert("لا يمكن استخراج بياناتك.");
+
+      const link = `https://t.me/JSjsjsksoixxjjsjsBot?start=${user.id}`;
+      const text = `انضم إلى اللعبة من رابطي واحصل على مكافأة! 🎁\n${link}`;
+
+      if (window.Telegram.WebApp) {
+        window.Telegram.WebApp.openTelegramLink(
+          `https://t.me/share/url?url=${encodeURIComponent(text)}`
+        );
+      } else {
+        alert("انسخ الرابط:\n" + link);
+      }
+    }
+
+    (async () => {
+      const user = getTelegramUser();
+      const referrerId = getReferrerId();
+      const messageDiv = document.getElementById('message');
+
+      if (user) {
+        await saveUser(user, referrerId);
+
+        if (referrerId) {
+          messageDiv.innerHTML = `<p>🎉 لقد دخلت اللعبة من خلال إحالة! وقد حصلت على 5 نقاط.</p>`;
+        } else {
+          messageDiv.innerHTML = `<p>👋 أهلاً بك! شارك رابطك مع أصدقائك لتحصل على نقاط.</p>`;
+        }
+
+        loadPoints();
+      } else {
+        messageDiv.innerHTML = `<p>⚠️ لا يمكن استخراج بيانات المستخدم.</p>`;
+      }
+    })();
+  </script>
+</body>
+</html>
